@@ -1,0 +1,31 @@
+server:
+  port: 8081
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+spring:
+  application:
+    name: AgencyConnectDashboard
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/agencydb
+    username: postgres
+    password: root
+    pool:
+      initial-size: 10
+      max-size: 20
+      max-idle-time: 30m
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc.postgresql: DEBUG
+    com.example.AgencyConnectDashboard: DEBUG
