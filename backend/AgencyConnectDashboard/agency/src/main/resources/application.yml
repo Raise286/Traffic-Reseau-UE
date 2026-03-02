@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: agency
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/agency_db
+    username: postgres
+    password: root
+    pool:
+      initial-size: 5
+      max-size: 20
+  sql:
+    init:
+      mode: always # Initialise le schéma schema.sql au démarrage
+
+# Configuration du Client Externe
+external:
+  agency-dashboard:
+    base-url: http://dashboard-api:9090
+    timeout-ms: 5000
+
+# Configuration Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      dashboardService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  retry:
+    instances:
+      dashboardService:
+        maxRetryAttempts: 3
+        waitDuration: 2s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2

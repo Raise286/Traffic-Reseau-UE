@@ -1,0 +1,15 @@
+# 1. On utilise une image avec Maven pour construire l'app (Le Cloud fait ça)
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+# Le Cloud compile ton projet ici
+RUN mvn clean package -DskipTests
+
+# 2. On prend juste le résultat (le .jar) pour le lancer
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+# On récupère le .jar construit à l'étape d'avant
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
