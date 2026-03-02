@@ -1,15 +1,57 @@
-# 1. On utilise une image avec Maven pour construire l'app (Le Cloud fait ça)
-FROM maven:3.9-eclipse-temurin-17 AS build
+# ========================================
+# ÉTAPE 1 : BUILD
+# ========================================
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
+
+# Copier pom.xml séparément pour profiter du cache Docker
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copier le code source
 COPY src ./src
-# Le Cloud compile ton projet ici
+
+# Build sans les tests
 RUN mvn clean package -DskipTests
 
-# 2. On prend juste le résultat (le .jar) pour le lancer
-FROM eclipse-temurin:17-jre-alpine
+# ========================================
+# ÉTAPE 2 : IMAGE FINALE LÉGÈRE
+# ========================================
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-# On récupère le .jar construit à l'étape d'avant
+
+# Copier le jar buildé
 COPY --from=build /app/target/*.jar app.jar
+
+# Port exposé (Render utilise la variable PORT)
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Lancement avec options JVM adaptées aux petits conteneurs (Free tier Render)
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]
+```
+
+---
+
+### Explication des options JVM
+
+| Option | Rôle |
+|---|---|
+| `-XX:+UseContainerSupport` | JVM respecte les limites RAM du container Docker |
+| `-XX:MaxRAMPercentage=75.0` | Utilise max 75% de la RAM dispo (évite les OOM kill) |
+| `-Djava.security.egd=file:/dev/./urandom` | Accélère le démarrage (problème classique de lenteur sur Linux) |
+
+---
+
+### Structure attendue de ton projet
+
+Assure-toi que ton `Dockerfile` est bien **à la racine** :
+```
+ton-projet/
+├── Dockerfile          ✅ ici
+├── pom.xml
+└── src/
+    └── main/...
