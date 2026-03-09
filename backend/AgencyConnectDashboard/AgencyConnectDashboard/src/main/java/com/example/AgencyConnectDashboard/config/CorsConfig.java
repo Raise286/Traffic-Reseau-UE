@@ -20,7 +20,8 @@ public class CorsConfig {
         corsConfig.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:5173",
-                "http://localhost:8080"
+                "http://localhost:8080",
+                "https://*.vercel.app"
         ));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowedMethods(List.of(
