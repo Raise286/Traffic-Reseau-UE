@@ -9,10 +9,11 @@ import { Client, Agency, ReservationPayload, TripType } from '../types';
  * C'est le backend qui déclenchera l'événement RESERVATION_CREATED.
  */
 // Récupère l'URL de Vercel, sinon utilise localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 
 // Enlève le délai artificiel si le site est en ligne
-const LATENCY = process.env.NODE_ENV === 'production' ? 0 : 800;
+const LATENCY = import.meta.env.MODE === "production" ? 0 : 800;
 // Stockage en mémoire (mutable) pour simuler la base de données
 // Note: Ces données seront réinitialisées au rafraîchissement de la page
 const agenciesList: Agency[] = [
