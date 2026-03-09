@@ -22,6 +22,7 @@ public class ReservationService {
 
         return agencyDashboardClient.post()
                 // L'URL de base est déjà configurée dans WebClientConfig
+                .uri("/api/events")
                 .bodyValue(event)
                 .retrieve()
                 .bodyToMono(Void.class)
