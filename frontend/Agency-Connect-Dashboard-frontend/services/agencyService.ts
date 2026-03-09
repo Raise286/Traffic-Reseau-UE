@@ -156,7 +156,7 @@ export class RealAgencyService implements IAgencyService {
     return res.json();
   }
 
-  a; // ✅ CORRECT
+   // ✅ CORRECT
   async processNotification(id: string): Promise<NotificationResponseDTO> {
     const response = await fetch(`${API_ENDPOINTS.PROCESS_NOTIFICATION(id)}`, {
       method: "PUT", // ⭐ IMPORTANT - C'est probablement ce qui manque
@@ -172,6 +172,8 @@ export class RealAgencyService implements IAgencyService {
       throw new Error(errorData.error || "Failed to process notification");
     }
 
-    return response.json();
+    // ✅ Après — vérifie si le body est vide avant de parser
+  const text = await response.text();
+  return text ? JSON.parse(text) : {};
   }
 }
