@@ -1,4 +1,5 @@
 package com.travel.central.service;
+
 import com.travel.central.domain.dto.ReservationEventDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,9 @@ public class ReservationService {
                 .uri("/api/events")
                 .bodyValue(event)
                 .retrieve()
-                .bodyToMono(Void.class)
+                .bodyToMono(String.class)
                 .doOnSuccess(v -> log.info("Événement transmis avec succès au dashboard."))
-                .doOnError(e -> log.error("Erreur lors de la transmission de l'événement: {}", e.getMessage()));
+                .doOnError(e -> log.error("Erreur lors de la transmission de l'événement: {}", e.getMessage()))
+                .then(); // ✅ C'EST CECI QUI MANQUAIT ET QUI RÈGLE L'ERREUR
     }
 }
